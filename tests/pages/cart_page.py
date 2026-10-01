@@ -1,4 +1,6 @@
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
 
 from tests.pages.base_page import BasePage
 
@@ -10,8 +12,17 @@ class CartPage(BasePage):
     CONTINUE_SHOPPING_BUTTON = (By.ID, "continue-shopping")
 
     def product_names(self) -> str:
-        products = self.driver.find_elements(*self.PRODUCT_NAMES)
-        return ", ".join(product.text for product in products)
+        def read_product_names(driver: WebDriver) -> str | bool:
+            products = driver.find_elements(*self.PRODUCT_NAMES)
+            if not products:
+                return False
+
+            try:
+                return ", ".join(product.text for product in products)
+            except StaleElementReferenceException:
+                return False
+
+        return self.wait.until(read_product_names)
 
     def product_count(self) -> int:
         return len(self.driver.find_elements(*self.PRODUCT_NAMES))
