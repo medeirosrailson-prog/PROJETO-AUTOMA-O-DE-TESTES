@@ -1,0 +1,4 @@
+guara
+pytest
+pytest-html
+selenium
