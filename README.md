@@ -69,7 +69,7 @@ A pipeline possui uma etapa de qualidade e suítes de teste independentes:
 3. **Regression**: executa em pushes para `main` e releases publicadas.
 4. **E2E**: executa diariamente às 06:00 UTC ou manualmente.
 
-As suítes são executadas em jobs paralelos, em Chrome headless, somente depois da aprovação da qualidade. Em caso de falha de teste, a screenshot é incluída no relatório HTML e salva em `reports/screenshots/`.
+As suítes são executadas em jobs paralelos, em Chrome headless, somente depois da aprovação da qualidade. O workflow reutilizável `.github/workflows/test-suite.yml` mantém a instalação, execução e publicação dos relatórios consistentes entre elas. Em caso de falha de teste, a screenshot é incluída no relatório HTML e salva em `reports/screenshots/`.
 
 Para usar a pipeline:
 

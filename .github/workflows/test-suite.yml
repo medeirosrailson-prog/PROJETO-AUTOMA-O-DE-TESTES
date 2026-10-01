@@ -1,0 +1,59 @@
+name: Test suite
+
+on:
+  workflow_call:
+    inputs:
+      suite:
+        description: Pytest marker to execute
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  BASE_URL: https://www.saucedemo.com/
+  CI: "true"
+  HEADLESS: "true"
+
+jobs:
+  run:
+    name: Run ${{ inputs.suite }} suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          mkdir -p reports/screenshots
+          python -m pytest tests/specs \
+            -m "${{ inputs.suite }}" \
+            --maxfail=1 \
+            --disable-warnings \
+            -v \
+            --html=reports/report.html \
+            --junitxml=reports/results.xml \
+            --self-contained-html
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ inputs.suite }}-${{ github.run_number }}
+          path: reports/
+          if-no-files-found: error
+          retention-days: 14

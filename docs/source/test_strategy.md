@@ -53,4 +53,4 @@ python -m pytest
 | Agendamento diário, 06:00 UTC | E2E |
 | Execução manual | Smoke, Regression e E2E em paralelo |
 
-O workflow executa as suítes em jobs paralelos após a aprovação da qualidade do código. Falhas nos testes geram screenshot PNG em `reports/screenshots/`, vinculada também ao relatório HTML; os relatórios são publicados como artefatos do GitHub Actions.
+O workflow executa as suítes em jobs paralelos após a aprovação da qualidade do código, compartilhando as etapas de execução por meio de `.github/workflows/test-suite.yml`. Falhas nos testes geram screenshot PNG em `reports/screenshots/`, vinculada também ao relatório HTML; os relatórios são publicados como artefatos do GitHub Actions.
