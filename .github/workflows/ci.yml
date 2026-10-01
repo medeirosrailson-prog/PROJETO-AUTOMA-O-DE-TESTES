@@ -27,10 +27,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -57,10 +57,10 @@ jobs:
     needs: quality
 
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -72,7 +72,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Run Pytest and generate reports
+      - name: Run tests
         run: |
           mkdir -p reports
           python -m pytest \
@@ -80,7 +80,7 @@ jobs:
             --junitxml=reports/results.xml \
             --self-contained-html
 
-      - name: Publish test results
+      - name: Upload reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
