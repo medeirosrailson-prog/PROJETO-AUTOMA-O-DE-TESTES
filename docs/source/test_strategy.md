@@ -16,22 +16,23 @@ Classificar os cenários para equilibrar feedback rápido durante a integração
 
 | Cenário | Categoria | Motivo |
 |---|---|---|
-| Login com sucesso | Smoke | É uma verificação rápida de disponibilidade e acesso ao catálogo |
+| Login com sucesso | Smoke, Regression, E2E | É pré-requisito para os fluxos autenticados e confirma acesso ao catálogo |
 | Login com credenciais inválidas | Regression | Confirma a regra de rejeição e a mensagem de erro |
 | Usuário bloqueado | Regression | Valida o bloqueio de uma conta específica |
 | Compra de produto com sucesso | Smoke, Regression, E2E | É o fluxo crítico de negócio e percorre login, catálogo, carrinho e checkout até a confirmação |
 | Adicionar item ao carrinho | Smoke, Regression, E2E | É uma etapa essencial da jornada de compra e valida a atualização do carrinho |
 | Remover item do carrinho | Regression | Valida remoção e estado vazio |
+| Adicionar múltiplos produtos ao carrinho | Regression | Confirma que mais de um produto distinto permanece no carrinho |
 | Ordenar produtos por preço crescente | Regression | Confirma a ordenação por preço |
 | Ordenar produtos por nome | Regression | Confirma a ordenação alfabética |
 | Continuar comprando após adicionar item | Regression | Valida a navegação de retorno ao catálogo |
 | Checkout sem preencher dados | Regression | Valida obrigatoriedade do nome |
 | Checkout parcial | Regression | Valida obrigatoriedade do CEP quando os demais campos estão preenchidos |
-| Logout com sucesso | Regression, E2E | Confirma encerramento correto da jornada e da sessão |
+| Logout com sucesso | Regression, E2E | Confirma encerramento correto da sessão |
 | Resetar carrinho | Regression | Confirma que o estado do carrinho pode ser limpo |
 | Acessar carrinho sem itens | Regression | Confirma o comportamento do carrinho vazio |
 
-Os cenários estão implementados em `tests/specs/` e recebem os marcadores declarados em `pytest.ini`. Um cenário pode receber mais de um marcador se a estratégia do produto exigir; a categoria deve continuar refletindo custo, criticidade e escopo reais, não apenas o nome do fluxo.
+Os 15 cenários estão implementados em `tests/specs/` e recebem os marcadores declarados em `pytest.ini`. Marcadores funcionais adicionais (`login`, `cart`, `checkout`, `products` e `purchase`) permitem selecionar áreas específicas. Um cenário pode receber mais de um marcador conforme sua criticidade e a classificação acordada.
 
 ## 4. Comandos
 
@@ -44,4 +45,12 @@ python -m pytest
 
 ## 5. Política de execução
 
-O workflow executa toda a suíte em pull requests e em pushes para `main`. Para repositórios maiores, pode-se executar smoke em cada pull request e reservar regressão/e2e para integração pós-merge ou release, monitorando duração, estabilidade e criticidade antes de alterar os gatilhos.
+| Evento | Suíte |
+|---|---|
+| Pull request para `main` | Smoke |
+| Push para `main` | Regression |
+| Publicação de release | Smoke e Regression |
+| Agendamento diário, 06:00 UTC | E2E |
+| Execução manual | Smoke, Regression e E2E em paralelo |
+
+O workflow executa as suítes em jobs paralelos após a aprovação da qualidade do código. Falhas nos testes geram screenshot PNG em `reports/screenshots/`, vinculada também ao relatório HTML; os relatórios são publicados como artefatos do GitHub Actions.

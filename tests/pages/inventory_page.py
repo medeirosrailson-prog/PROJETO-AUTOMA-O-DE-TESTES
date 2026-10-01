@@ -14,10 +14,9 @@ class InventoryPage(BasePage):
     MENU_BUTTON = (By.ID, "react-burger-menu-btn")
     LOGOUT_LINK = (By.ID, "logout_sidebar_link")
     RESET_LINK = (By.ID, "reset_sidebar_link")
-    ADD_BACKPACK = (By.ID, "add-to-cart-sauce-labs-backpack")
 
-    def add_backpack(self) -> str:
-        self.click(self.ADD_BACKPACK)
+    def add_product(self, product_id: str) -> str:
+        self.click((By.ID, f"add-to-cart-{product_id}"))
         return self.cart_badge_count()
 
     def cart_badge_count(self) -> str:

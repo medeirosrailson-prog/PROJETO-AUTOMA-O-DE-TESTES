@@ -7,6 +7,11 @@ on:
   pull_request:
     branches:
       - main
+  release:
+    types:
+      - published
+  schedule:
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -52,9 +57,28 @@ jobs:
         run: python -m flake8 .
 
   tests:
-    name: Automated tests
+    name: Tests (${{ matrix.suite }})
     runs-on: ubuntu-latest
     needs: quality
+    if: >-
+      (matrix.suite == 'smoke' &&
+      (github.event_name == 'pull_request' ||
+      github.event_name == 'release' ||
+      github.event_name == 'workflow_dispatch')) ||
+      (matrix.suite == 'regression' &&
+      (github.event_name == 'push' ||
+      github.event_name == 'release' ||
+      github.event_name == 'workflow_dispatch')) ||
+      (matrix.suite == 'e2e' &&
+      (github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch'))
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - smoke
+          - regression
+          - e2e
 
     steps:
       - name: Checkout
@@ -75,7 +99,12 @@ jobs:
       - name: Run tests
         run: |
           mkdir -p reports
-          python -m pytest \
+          mkdir -p reports/screenshots
+          python -m pytest tests/specs \
+            -m "${{ matrix.suite }}" \
+            --maxfail=1 \
+            --disable-warnings \
+            -v \
             --html=reports/report.html \
             --junitxml=reports/results.xml \
             --self-contained-html
@@ -84,7 +113,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-${{ github.run_number }}
+          name: test-reports-${{ matrix.suite }}-${{ github.run_number }}
           path: reports/
           if-no-files-found: error
           retention-days: 14

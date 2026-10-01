@@ -6,6 +6,9 @@ from tests.transactions.login_transaction import LoginTransaction
 
 
 @pytest.mark.smoke
+@pytest.mark.regression
+@pytest.mark.e2e
+@pytest.mark.login
 def test_login_com_sucesso_exibe_catalogo(app, login_data):
     credentials = login_data["valid_user"]
     app.at(

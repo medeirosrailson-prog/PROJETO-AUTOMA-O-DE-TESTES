@@ -58,20 +58,25 @@ New-Item -ItemType Directory -Force reports
 python -m pytest --html=reports/report.html --self-contained-html --junitxml=reports/results.xml
 ```
 
-O workflow em `.github/workflows/ci.yml` executa a validação de qualidade e toda a suíte em pull requests e pushes para `main`. Também pode ser iniciado manualmente pela aba **Actions** do GitHub e publica os relatórios HTML e JUnit como artefatos por 14 dias, inclusive quando os testes falham.
+O workflow em `.github/workflows/ci.yml` executa a validação de qualidade e a suíte apropriada ao evento: Smoke em pull requests, Regression em pushes para `main`, Smoke e Regression em releases publicadas e E2E diariamente. Também pode ser iniciado manualmente pela aba **Actions** do GitHub, quando as três suítes rodam em paralelo. Cada suíte publica os relatórios HTML, JUnit e screenshots de falhas como artefatos por 14 dias.
 
 ### Pipeline do GitHub Actions
 
-A pipeline possui duas etapas:
+A pipeline possui uma etapa de qualidade e suítes de teste independentes:
 
 1. **Code quality**: executa Black, isort e Flake8.
-2. **Automated tests**: executa os testes em Chrome headless depois da aprovação da qualidade e publica `report.html` e `results.xml`.
+2. **Smoke**: executa em pull requests e releases publicadas.
+3. **Regression**: executa em pushes para `main` e releases publicadas.
+4. **E2E**: executa diariamente às 06:00 UTC ou manualmente.
+
+As suítes são executadas em jobs paralelos, em Chrome headless, somente depois da aprovação da qualidade. Em caso de falha de teste, a screenshot é incluída no relatório HTML e salva em `reports/screenshots/`.
 
 Para usar a pipeline:
 
 1. Publique este projeto em um repositório GitHub.
 2. Faça push para `main` ou abra um pull request direcionado para `main`.
 3. Acesse **Actions → CI** para acompanhar a execução e baixar os relatórios em **Artifacts**.
+4. Para validar uma release, publique-a no GitHub; para E2E imediato, use **Run workflow**.
 
 ## Classificação dos cenários
 
@@ -81,7 +86,7 @@ Para usar a pipeline:
 | `regression` | Validar comportamentos integrados de login, catálogo, carrinho e checkout | `python -m pytest -m regression` |
 | `e2e` | Validar a jornada crítica de compra até a confirmação | `python -m pytest -m e2e` |
 
-O smoke valida login, adição de item ao carrinho e compra completa. A regressão cobre todos os cenários funcionais, incluindo credenciais inválidas, usuário bloqueado, operações e ordenação do carrinho, continuidade de compra, validações do checkout, logout, reset do carrinho e carrinho vazio. O e2e cobre a compra completa, a adição de item e o logout, conforme a criticidade de cada jornada.
+Marcadores funcionais adicionais permitem selecionar cenários por domínio: `login`, `cart`, `checkout`, `products` e `purchase`. O smoke valida login, adição de item ao carrinho e compra completa. A regressão cobre todos os cenários funcionais, incluindo credenciais inválidas, usuário bloqueado, operações e ordenação do carrinho, compra com múltiplos produtos, continuidade de compra, validações do checkout, logout, reset do carrinho e carrinho vazio. O e2e segue a matriz de classificação documentada em `docs/source/test_strategy.md`.
 
 ## Estrutura
 

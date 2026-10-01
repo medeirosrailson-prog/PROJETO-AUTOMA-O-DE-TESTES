@@ -10,6 +10,8 @@ from tests.transactions.open_cart_transaction import OpenCartTransaction
 @pytest.mark.e2e
 @pytest.mark.smoke
 @pytest.mark.regression
+@pytest.mark.purchase
+@pytest.mark.checkout
 def test_compra_de_produto_com_sucesso(logged_in_app, checkout_data):
     customer = checkout_data["valid_customer"]
     logged_in_app.when(AddToCartTransaction).asserts(it.IsEqualTo, "1")

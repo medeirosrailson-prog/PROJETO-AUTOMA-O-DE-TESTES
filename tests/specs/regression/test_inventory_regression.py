@@ -5,6 +5,7 @@ from tests.transactions.sort_products_transaction import SortProductsTransaction
 
 
 @pytest.mark.regression
+@pytest.mark.products
 def test_ordenar_produtos_por_preco_crescente(logged_in_app):
     result = logged_in_app.at(SortProductsTransaction, option="lohi")
     expected_order = (
@@ -16,6 +17,7 @@ def test_ordenar_produtos_por_preco_crescente(logged_in_app):
 
 
 @pytest.mark.regression
+@pytest.mark.products
 def test_ordenar_produtos_por_nome(logged_in_app):
     result = logged_in_app.at(SortProductsTransaction, option="az")
     expected_order = (

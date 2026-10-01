@@ -9,6 +9,7 @@ from tests.transactions.open_cart_transaction import OpenCartTransaction
 
 
 @pytest.mark.regression
+@pytest.mark.checkout
 def test_checkout_sem_preencher_dados_exibe_erro(logged_in_app):
     logged_in_app.when(AddToCartTransaction)
     logged_in_app.when(OpenCartTransaction)
@@ -21,6 +22,7 @@ def test_checkout_sem_preencher_dados_exibe_erro(logged_in_app):
 
 
 @pytest.mark.regression
+@pytest.mark.checkout
 def test_checkout_parcial_exige_cep(logged_in_app):
     logged_in_app.when(AddToCartTransaction)
     logged_in_app.when(OpenCartTransaction)
